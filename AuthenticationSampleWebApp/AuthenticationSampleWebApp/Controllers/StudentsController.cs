@@ -15,68 +15,27 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AuthenticationSampleWebApp.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/students")]
     [ApiController]
     public class StudentsController : ControllerBase
     {
-        public IConfiguration Configuration { get; set; }
-        public StudentsController(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        } 
-
         [HttpGet]
-        [Authorize(Roles = "admin")]
         public IActionResult GetStudents()
         {
-
-
-            var list = new List<Student>();
-            list.Add(new Student
+            var list = new List<ShortStudent>();
+            list.Add(new ShortStudent
             {
                 IdStudent = 1,
-                FirstName = "Jan",
-                LastName = "Kowalski"
+                Name = "Andrzej"
             });
-            list.Add(new Student
+            list.Add(new ShortStudent
             {
-                IdStudent = 2,
-                FirstName = "Piotr",
-                LastName = "Nowak"
+                IdStudent = 3,
+                Name = "Wieslaw"
             });
             return Ok(list);
-
         }
 
-        [HttpPost]
-        public IActionResult Login(LoginRequestDto request)
-        {
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim(ClaimTypes.Name, "jan123"),
-                new Claim(ClaimTypes.Role, "admin"),
-                new Claim(ClaimTypes.Role, "student"),
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken
-                (
-                    issuer: "Gakko",
-                    audience: "Students",
-                    claims: claims,
-                    expires: DateTime.Now.AddMinutes(10),
-                    signingCredentials: creds
-                ); 
-
-            return Ok(new
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(token), //5-10
-                refreshToken = Guid.NewGuid() //
-            });
-        }
     }
-    
+
 }

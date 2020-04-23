@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AuthenticationSampleWebApp.Handlers;
+using AuthenticationSampleWebApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -29,7 +30,9 @@ namespace AuthenticationSampleWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IStudentDbService, SqlServerStudentDbService>();
             //HTTP Basic
+            
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
                     {
@@ -47,8 +50,8 @@ namespace AuthenticationSampleWebApp
             //services.AddAuthentication("AuthenticationBasic")
             //      .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("AuthenticationBasic", null);
 
-            services.AddControllers()
-                    .AddXmlSerializerFormatters();
+            services.AddControllers();
+                    //.AddXmlSerializerFormatters();
 
 
             //content negotiation

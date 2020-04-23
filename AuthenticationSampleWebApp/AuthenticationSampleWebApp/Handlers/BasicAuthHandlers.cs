@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using AuthenticationSampleWebApp.DTOs;
+using AuthenticationSampleWebApp.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -23,10 +25,14 @@ namespace AuthenticationSampleWebApp.Handlers
         {
 
         }
+
+        private SqlServerStudentDbService _service;
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             if (!Request.Headers.ContainsKey("Authorization"))
                 return AuthenticateResult.Fail("Missing authorization haeder");
+
+
 
             //"Autorization: Basic xxxxx"
             var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
@@ -36,13 +42,25 @@ namespace AuthenticationSampleWebApp.Handlers
             if(credentials.Length != 2)
                 return AuthenticateResult.Fail("Incorrect authorization header value");
 
+            _service = new SqlServerStudentDbService();
+
+            var login = new LoginRequestDto
+            {
+                Login = credentials[0],
+                Haslo = credentials[1]
+            };
+
+            if (!_service.CheckUserPassword(login))
+                return AuthenticateResult.Fail("User or password incorrect");
+
+
             //TODO chceck credentials id DB
 
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim(ClaimTypes.Name, "jan123"),
-                new Claim(ClaimTypes.Role, "admin"),
+                new Claim(ClaimTypes.Name, credentials[0]),
+                new Claim(ClaimTypes.Role, "employee"),
                 new Claim(ClaimTypes.Role, "student"),
             };
 

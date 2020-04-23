@@ -9,5 +9,6 @@ namespace AuthenticationSampleWebApp.DTOs
     {
         public string Login { get; set; }
         public string Password { get; set; }
+        public string Haslo { get; internal set; }
     }
 }
